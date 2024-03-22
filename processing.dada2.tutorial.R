@@ -121,7 +121,7 @@ filtRs <- file.path(path.cut, "filtered", basename(cutRs))
 #it is best, after primer removal, to not truncate with 18s data, or with data from any region in which the length is broadly variable. you may exclude organisms that have a shorter insert than the truncation length (definitely possible, good example is giardia). defining a minimum sequence length is best.
 out <- filterAndTrim(cutFs, filtFs, cutRs, filtRs, truncLen=c(0,0), minLen = c(150,120),
                      maxN=c(0,0), maxEE=c(6,8), truncQ=c(2,2), rm.phix=TRUE, matchIDs=TRUE,
-                     compress=TRUE, multithread=TRUE)
+                     compress=TRUE, multithread=36)
 retained <- as.data.frame(out)
 retained$percentage_retained <- retained$reads.out/retained$reads.in*100
 write.table(retained, "retained_reads.filterAndTrim_step.txt", sep="\t", row.names=TRUE, col.names=TRUE, quote=FALSE)
@@ -189,7 +189,6 @@ pdf("length_histogram.merged_reads.pdf", width = 10, height = 8) # define plot w
 dev.off()
 
 ####remove low-count singleton ASVs####
-#create phyloseq otu_table
 otus <- otu_table(t(seqtab), taxa_are_rows = TRUE)
 
 #generate counts of sample per ASV
@@ -261,7 +260,7 @@ write.table(data.frame("row_names"=rownames(seqtab.nosingletons.nochim),seqtab.n
 ## creating a DNAStringSet object from the ASVs
 seq_16S <- DNAStringSet(getSequences(seqtab.nosingletons.nochim))
 
-## downloading silva DECIPHER database #choose here between GTDB, SILVA, Contax for 16S. DECIPHER devs recommend GTDB. SILVA still has the broadest taxonomic content, but GTDB is the newest published reference taxonomy. see here for details: http://www2.decipher.codes/ClassifyOrganismsFAQ.html
+## downloading DECIPHER database #choose here between GTDB, SILVA, Contax for 16S. DECIPHER devs recommend GTDB. SILVA still has the broadest taxonomic content, but GTDB is the newest published reference taxonomy. see here for details: http://www2.decipher.codes/ClassifyOrganismsFAQ.html
 download.file("http://www2.decipher.codes/Classification/TrainingSets/GTDB_r214-mod_April2023.RData", "GTDB_r214-mod_April2023.RData")
 # loading ref taxonomy object
 load("GTDB_r214-mod_April2023.RData")
